@@ -4,6 +4,7 @@ import net.tokensmith.parser.exception.DataTypeException;
 import net.tokensmith.parser.exception.OptionalException;
 import net.tokensmith.parser.exception.RequiredException;
 import net.tokensmith.parser.exception.ValueException;
+import net.tokensmith.parser.factory.TypeParserFactory;
 import net.tokensmith.parser.validator.Dummy;
 import net.tokensmith.parser.validator.OptionalParam;
 import net.tokensmith.parser.validator.RequiredParam;
@@ -36,7 +37,7 @@ class ParserTest {
     @BeforeEach
     void setUp() {
         subject = new Parser<Dummy>(
-                new OptionalParam(), new RequiredParam()
+                new OptionalParam(), new RequiredParam(), new TypeParserFactory<Dummy>()
         );
     }
 
