@@ -1,0 +1,132 @@
+allprojects {
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+        }
+    }
+    version = "0.0.1-SNAPSHOT"
+}
+
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
+
+group = "net.tokensmith"
+description = """Parser"""
+
+sourceCompatibility = 12
+targetCompatibility = 12
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
+repositories {
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+    maven { url "https://oss.sonatype.org/content/repositories/releases" }
+    mavenCentral()
+    mavenLocal()
+}
+
+configurations {
+    deployerJars
+}
+
+ext {
+    log4jVersion = '2.12.0'
+    junitVersion = '5.3.1'
+    mockitoVersion = '2.28.2'
+}
+
+dependencies {
+    compile "org.slf4j:slf4j-simple:1.7.26"
+    compile "org.apache.logging.log4j:log4j-1.2-api:${log4jVersion}"
+    compile "org.apache.logging.log4j:log4j-api:${log4jVersion}"
+    compile "org.apache.logging.log4j:log4j-core:${log4jVersion}"
+    testCompile "org.mockito:mockito-core:${mockitoVersion}"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
+}
+
+tasks.test {
+    useJUnit()
+    useJUnitPlatform()
+}
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+    archiveClassifier = 'sources'
+}
+
+task javadocJar(type: Jar) {
+    from javadoc
+    archiveClassifier = 'javadoc'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = 'parser'
+            from components.java
+            artifact sourcesJar
+            artifact javadocJar
+
+            pom {
+                name = 'parser'
+                packaging = 'jar'
+                description = 'Parses HTTP inputs to POJOs'
+                url = 'https://github.com/tokensmith/parser'
+
+                scm {
+                    connection = 'git@github.com:tokensmith/parser.git'
+                    developerConnection = 'git@github.com:tokensmith/parser.git'
+                    url = 'https://github.com/tokensmith/parser'
+                }
+
+                licenses {
+                    license {
+                        name = 'The MIT License (MIT)'
+                        url = 'https://github.com/tokensmith/parser/blob/master/LICENSE'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = 'tmackenzie'
+                        name = 'Tom MacKenzie'
+                        email = 'tom@tokensmith.net'
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+            def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots"
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+
+            if(!project.ext.properties.containsKey("ossrhUser")) {
+                project.ext.ossrhUser = 'wrongUser'
+                project.ext.ossrhPassword = 'wrongPassword'
+                print "no ossrh user or password"
+            }
+            credentials {
+                username = project.ext.ossrhUser
+                password = project.ext.ossrhPassword
+            }
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.mavenJava
+}
+
+javadoc {
+    if(JavaVersion.current().isJava9Compatible()) {
+        options.addBooleanOption('html5', true)
+    }
+}
