@@ -1,8 +1,6 @@
 package net.tokensmith.parser.validator;
 
-/**
- * Created by tommackenzie on 3/31/17.
- */
+
 public enum RawType {
     LIST ("java.util.List"),
     OPTIONAL ("java.util.Optional");

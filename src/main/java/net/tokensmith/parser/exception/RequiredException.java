@@ -1,8 +1,6 @@
 package net.tokensmith.parser.exception;
 
-/**
- * Created by tommackenzie on 3/30/17.
- */
+
 public class RequiredException extends Exception {
     private String field;
     private String param;

@@ -1,8 +1,6 @@
 package net.tokensmith.parser.validator;
 
-/**
- * Created by tommackenzie on 3/31/17.
- */
+
 public enum SupportedTypes {
     UUID ("java.util.UUID");
 

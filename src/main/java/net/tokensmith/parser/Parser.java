@@ -67,9 +67,14 @@ public class Parser<T> {
         }
 
         for(ParamEntity field: fields) {
+            // instance variable
             Field f = field.getField();
+
+            // parameter settings for the ivar
             Parameter p = field.getParameter();
             String[] expected = p.expected();
+
+            // key to use to assign values to f.
             List<String> from = params.get(p.name());
 
             try {
@@ -83,44 +88,33 @@ public class Parser<T> {
             }
 
             try {
-                if (f.getGenericType() instanceof ParameterizedType) {
-                    // this is a List or Optional
+                if(field.isParameterized() && isEmpty(from) && field.isList()) {
+                    ArrayList<Object> arrayList = new ArrayList<>();
+                    f.set(o, arrayList);
+                } else if (field.isParameterized() && isEmpty(from) && field.isOptional()) {
+                    f.set(o, Optional.empty());
+                } else if (field.isParameterized() && !isEmpty(from)) {
+                    // there maybe multiple values in from since it could be a list.
+                    List<String> parsedValues = stringToList(from.get(0));
+                    Boolean inputOk = isExpected(parsedValues, expected);
 
-                    ParameterizedType pt = (ParameterizedType) f.getGenericType();
-                    String rawType = pt.getRawType().getTypeName();
-                    String argType = pt.getActualTypeArguments()[0].getTypeName();
-
-                    if (from == null || from.size() == 0) {
-                        // these will be optional parameters.
-                        if (RawType.LIST.getTypeName().equals(rawType)) {
-                            ArrayList<Object> arrayList = new ArrayList<>();
-                            f.set(o, arrayList);
-                        } else if (RawType.OPTIONAL.getTypeName().equals(rawType)) {
-                            f.set(o, Optional.empty());
+                    if (inputOk && field.isList()){
+                        ArrayList arrayList = new ArrayList<>();
+                        for (String parsedValue : parsedValues) {
+                            // this could be a factory with static implementations
+                            var item = make(field.getArgType(), parsedValue);
+                            arrayList.add(item);
                         }
+                        f.set(o, arrayList);
+                    } else if (inputOk && field.isOptional()) {
+                        Object item = make(field.getArgType(), from.get(0));
+                        f.set(o, Optional.of(item));
+
                     } else {
-
-                        // there maybe multiple values in from since it could be a list.
-                        List<String> parsedValues = stringToList(from.get(0));
-
-                        if (isExpected(parsedValues, expected)){
-                            if (RawType.LIST.getTypeName().equals(rawType)) {
-                                ArrayList arrayList = new ArrayList<>();
-                                for (String parsedValue : parsedValues) {
-                                    // this could be a factory with static implementations
-                                    var item = make(argType, parsedValue);
-                                    arrayList.add(item);
-                                }
-                                f.set(o, arrayList);
-                            } else if (RawType.OPTIONAL.getTypeName().equals(rawType)) {
-                                Object item = make(argType, from.get(0));
-                                f.set(o, Optional.of(item));
-                            }
-                        } else {
-                            ValueException ve = new ValueException(UNSUPPORTED_ERROR, f.getName(), p.name(), from.get(0));
-                            throw new RequiredException(UNSUPPORTED_ERROR, ve, f.getName(), p.name(), o);
-                        }
+                        ValueException ve = new ValueException(UNSUPPORTED_ERROR, f.getName(), p.name(), from.get(0));
+                        throw new RequiredException(UNSUPPORTED_ERROR, ve, f.getName(), p.name(), o);
                     }
+
                 } else if (isExpected(from.get(0), expected)){
                     Object item = make(f.getGenericType().getTypeName(), from.get(0));
                     f.set(o, item);
@@ -161,6 +155,10 @@ public class Parser<T> {
             }
         }
         return validated;
+    }
+
+    protected Boolean isEmpty(List<String> values) {
+        return values == null || values.size() == 0;
     }
 
     /**
@@ -258,10 +256,26 @@ public class Parser<T> {
             Parameter p = field.getAnnotation(Parameter.class);
             if (p != null) {
                 field.setAccessible(true);
-                fields.add(new ParamEntity(field, p));
+
+                if (isParameterized(field)) {
+                    ParameterizedType pt = (ParameterizedType) field.getGenericType();
+                    String rawType = pt.getRawType().getTypeName();
+                    String argType = pt.getActualTypeArguments()[0].getTypeName();
+                    Boolean isList = RawType.LIST.getTypeName().equals(rawType);
+                    Boolean isOptional = RawType.OPTIONAL.getTypeName().equals(rawType);
+
+                    fields.add(new ParamEntity(field, p, true, rawType, argType, isList, isOptional));
+                } else {
+                    fields.add(new ParamEntity(field, p, false));
+                }
+
             }
         }
 
         return fields;
+    }
+
+    protected Boolean isParameterized(Field field) {
+        return (field.getGenericType() instanceof ParameterizedType);
     }
 }

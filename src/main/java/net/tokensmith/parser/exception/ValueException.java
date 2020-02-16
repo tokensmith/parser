@@ -1,8 +1,6 @@
 package net.tokensmith.parser.exception;
 
-/**
- * Created by tommackenzie on 4/4/17.
- */
+
 public class ValueException extends Exception {
     private String field;
     private String param;
