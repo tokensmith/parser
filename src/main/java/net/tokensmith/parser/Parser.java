@@ -1,44 +1,32 @@
 package net.tokensmith.parser;
 
 
-
-import net.tokensmith.parser.exception.DataTypeException;
 import net.tokensmith.parser.exception.OptionalException;
 import net.tokensmith.parser.exception.ParseException;
 import net.tokensmith.parser.exception.RequiredException;
-import net.tokensmith.parser.exception.ValueException;
 import net.tokensmith.parser.factory.TypeParser;
 import net.tokensmith.parser.factory.TypeParserFactory;
 import net.tokensmith.parser.validator.OptionalParam;
 import net.tokensmith.parser.validator.RawType;
 import net.tokensmith.parser.validator.RequiredParam;
-import net.tokensmith.parser.validator.SupportedTypes;
 import net.tokensmith.parser.validator.exception.EmptyValueError;
 import net.tokensmith.parser.validator.exception.MoreThanOneItemError;
 import net.tokensmith.parser.validator.exception.NoItemsError;
 import net.tokensmith.parser.validator.exception.ParamIsNullError;
 
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
 
 
 public class Parser<T> {
     private static String TO_OBJ_ERROR = "Could not construct to object";
-    private static String FIELD_ERROR = "Could not set field value";
-    private static String CNF_ERROR = "Could not find target class";
-    private static String CONSTRUCT_ERROR = "Could not construct field object";;
     private static String REQ_ERROR="Required field failed validation";
     private static String OPT_ERROR="Optional field failed validation";
-    private static String DELIMITTER = " ";
-    private static String UNSUPPORTED_ERROR = "input value is not supported";
     private OptionalParam optionalParam;
     private RequiredParam requiredParam;
     private TypeParserFactory<T> typeParserFactory;
