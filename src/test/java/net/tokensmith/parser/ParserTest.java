@@ -1,5 +1,6 @@
 package net.tokensmith.parser;
 
+import net.tokensmith.parser.builder.exception.ConstructException;
 import net.tokensmith.parser.exception.DataTypeException;
 import net.tokensmith.parser.exception.OptionalException;
 import net.tokensmith.parser.exception.RequiredException;
@@ -19,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -36,8 +38,17 @@ class ParserTest {
 
     @BeforeEach
     void setUp() {
+        Map<String, Function<String, Object>> builders = new HashMap<>();
+        builders.put("java.util.UUID", s -> {
+            try{
+                return UUID.fromString(s);
+            } catch (Exception e) {
+                throw new ConstructException("", e);
+            }
+        });
+
         subject = new Parser<Dummy>(
-                new OptionalParam(), new RequiredParam(), new TypeParserFactory<Dummy>()
+                new OptionalParam(), new RequiredParam(), new TypeParserFactory<Dummy>(), builders
         );
     }
 
@@ -173,7 +184,7 @@ class ParserTest {
         Map<String, List<String>> params = makeParameters();
         params.remove("opt_uuid");
 
-        Dummy actual = (Dummy) subject.to(Dummy.class, fields, params);
+        Dummy actual = subject.to(Dummy.class, fields, params);
 
         assertNotNull(actual);
         assertNotNull(actual.getOptId());
@@ -311,16 +322,13 @@ class ParserTest {
         }
 
         assertNotNull(actualException);
-        assertTrue(actualException.getCause() instanceof DataTypeException);
+        assertTrue(actualException.getCause() instanceof ConstructException);
         assertEquals("id", actualException.getField());
         assertEquals("uuid", actualException.getParam());
 
-        // inspect the DataTypeException
-        DataTypeException actualCause = (DataTypeException) actualException.getCause();
+        // inspect the ConstructException
+        ConstructException actualCause = (ConstructException) actualException.getCause();
         assertNotNull(actualCause);
-        assertEquals("id", actualCause.getField());
-        assertEquals("uuid", actualCause.getParam());
-        assertEquals("invalid-uuid", actualCause.getValue());
         assertTrue(actualCause.getCause() instanceof IllegalArgumentException);
 
         Dummy actual = (Dummy) actualException.getTarget();
@@ -342,16 +350,13 @@ class ParserTest {
         }
 
         assertNotNull(actualException);
-        assertTrue(actualException.getCause() instanceof DataTypeException);
+        assertTrue(actualException.getCause() instanceof ConstructException);
         assertEquals("optId", actualException.getField());
         assertEquals("opt_uuid", actualException.getParam() );
 
-        // inspect the DataTypeException
-        DataTypeException actualCause = (DataTypeException) actualException.getCause();
+        // inspect the ConstructException
+        ConstructException actualCause = (ConstructException) actualException.getCause();
         assertNotNull(actualCause);
-        assertEquals("optId", actualCause.getField());
-        assertEquals("opt_uuid", actualCause.getParam());
-        assertEquals("invalid-uuid", actualCause.getValue());
         assertTrue(actualCause.getCause() instanceof IllegalArgumentException);
 
         Dummy actual = (Dummy) actualException.getTarget();

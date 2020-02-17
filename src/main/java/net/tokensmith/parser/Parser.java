@@ -1,6 +1,7 @@
 package net.tokensmith.parser;
 
 
+import net.tokensmith.parser.builder.ReflectionBuilder;
 import net.tokensmith.parser.exception.OptionalException;
 import net.tokensmith.parser.exception.ParseException;
 import net.tokensmith.parser.exception.RequiredException;
@@ -15,12 +16,15 @@ import net.tokensmith.parser.validator.exception.NoItemsError;
 import net.tokensmith.parser.validator.exception.ParamIsNullError;
 
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 
 public class Parser<T> {
@@ -30,12 +34,14 @@ public class Parser<T> {
     private OptionalParam optionalParam;
     private RequiredParam requiredParam;
     private TypeParserFactory<T> typeParserFactory;
+    private Map<String, Function<String, Object>> builders;
 
 
-    public Parser(OptionalParam optionalParam, RequiredParam requiredParam, TypeParserFactory<T> typeParserFactory) {
+    public Parser(OptionalParam optionalParam, RequiredParam requiredParam, TypeParserFactory<T> typeParserFactory, Map<String, Function<String, Object>> builders) {
         this.optionalParam = optionalParam;
         this.requiredParam = requiredParam;
         this.typeParserFactory = typeParserFactory;
+        this.builders = builders;
     }
 
     /**
@@ -126,11 +132,13 @@ public class Parser<T> {
                     Boolean isList = RawType.LIST.getTypeName().equals(rawType);
                     Boolean isOptional = RawType.OPTIONAL.getTypeName().equals(rawType);
 
-                    fields.add(new ParamEntity(field, p, true, rawType, argType, isList, isOptional));
-                } else {
-                    fields.add(new ParamEntity(field, p, false));
-                }
+                    Function<String, Object> builder = builderForField(argType);
 
+                    fields.add(new ParamEntity(field, p, true, rawType, argType, isList, isOptional, builder));
+                } else {
+                    Function<String, Object> builder = builderForField(field.getGenericType().getTypeName());
+                    fields.add(new ParamEntity(field, p, false, builder));
+                }
             }
         }
 
@@ -139,5 +147,33 @@ public class Parser<T> {
 
     protected Boolean isParameterized(Field field) {
         return (field.getGenericType() instanceof ParameterizedType);
+    }
+
+    public Function<String, Object> builderForField(String className) {
+        Function<String, Object> builder = builders.get(className);
+        if (builder == null) {
+            Constructor<?> ctor = ctorForField(className);
+            builder = new ReflectionBuilder(ctor);
+            builders.put(className, builder);
+        }
+        return builder;
+    }
+
+    public Constructor<?> ctorForField(String className) {
+        Class<?> target;
+        try {
+            target = Class.forName(className);
+        } catch (ClassNotFoundException e) {
+            // TODO: Throw Exception
+            return null;
+        }
+
+        Constructor<?> ctor = null;
+        try {
+            ctor = target.getConstructor(String.class);
+        } catch (NoSuchMethodException e) {
+            // TODO: log me
+        }
+        return ctor;
     }
 }

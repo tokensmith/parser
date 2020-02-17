@@ -2,6 +2,7 @@ package net.tokensmith.parser.factory;
 
 import net.tokensmith.parser.ParamEntity;
 import net.tokensmith.parser.ParserUtils;
+import net.tokensmith.parser.builder.exception.ConstructException;
 import net.tokensmith.parser.exception.DataTypeException;
 import net.tokensmith.parser.exception.OptionalException;
 import net.tokensmith.parser.exception.ParseException;
@@ -32,9 +33,9 @@ public class ReferenceTypeParser<T> implements TypeParser<T> {
 
         Object item = null;
         try {
-            item = parserUtils.make(toField.getField().getGenericType().getTypeName(), from.get(0));
-        } catch (DataTypeException e) {
-            parserUtils.handleDataTypeException(e, toField, to);
+            item = toField.getBuilder().apply(from.get(0));
+        } catch (Exception e) {
+            parserUtils.handleConstructorException(e, toField, to);
         }
 
         try {

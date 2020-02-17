@@ -2,6 +2,7 @@ package net.tokensmith.parser.factory;
 
 import net.tokensmith.parser.ParamEntity;
 import net.tokensmith.parser.ParserUtils;
+import net.tokensmith.parser.builder.exception.ConstructException;
 import net.tokensmith.parser.exception.DataTypeException;
 import net.tokensmith.parser.exception.OptionalException;
 import net.tokensmith.parser.exception.ParseException;
@@ -34,9 +35,9 @@ public class ListParser<T> implements TypeParser<T> {
         for (String parsedValue : parsedValues) {
             Object item = null;
             try {
-                item = parserUtils.make(toField.getArgType(), parsedValue);
-            } catch (DataTypeException e) {
-                parserUtils.handleDataTypeException(e, toField, to);
+                item = toField.getBuilder().apply(parsedValue);
+            } catch (Exception e) {
+                parserUtils.handleConstructorException(e, toField, to);
             }
             arrayList.add(item);
         }

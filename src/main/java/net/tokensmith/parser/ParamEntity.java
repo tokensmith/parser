@@ -1,6 +1,8 @@
 package net.tokensmith.parser;
 
+
 import java.lang.reflect.Field;
+import java.util.function.Function;
 
 
 public class ParamEntity {
@@ -11,15 +13,17 @@ public class ParamEntity {
     private String argType; // type of individual item List<X> or just X.
     private Boolean isList;
     private Boolean isOptional;
+    private Function<String, Object> builder;
 
 
-    public ParamEntity(Field field, Parameter parameter, Boolean isParameterized) {
+    public ParamEntity(Field field, Parameter parameter, Boolean isParameterized, Function<String, Object> builder) {
         this.field = field;
         this.parameter = parameter;
         this.parameterized = isParameterized;
+        this.builder = builder;
     }
 
-    public ParamEntity(Field field, Parameter parameter, Boolean parameterized, String rawType, String argType, Boolean isList, Boolean isOptional) {
+    public ParamEntity(Field field, Parameter parameter, Boolean parameterized, String rawType, String argType, Boolean isList, Boolean isOptional, Function<String, Object> builder) {
         this.field = field;
         this.parameter = parameter;
         this.parameterized = parameterized;
@@ -27,6 +31,7 @@ public class ParamEntity {
         this.argType = argType;
         this.isList = isList;
         this.isOptional = isOptional;
+        this.builder = builder;
     }
 
     public Field getField() {
@@ -83,5 +88,13 @@ public class ParamEntity {
 
     public void setOptional(Boolean optional) {
         isOptional = optional;
+    }
+
+    public Function<String, Object> getBuilder() {
+        return builder;
+    }
+
+    public void setBuilder(Function<String, Object> builder) {
+        this.builder = builder;
     }
 }
