@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class Dummy implements Parsable {
+public class DummyTwo implements Parsable {
     @Parameter(name="string", expected = {"string1"})
     private String string;
 
@@ -40,9 +40,6 @@ public class Dummy implements Parsable {
     private List<String> optList;
 
     private String notAnnotated;
-
-    @Parameter(name="nested", required = false)
-    private DummyTwo nested;
 
     public String getString() {
         return string;

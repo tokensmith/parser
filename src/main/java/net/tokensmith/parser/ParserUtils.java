@@ -22,18 +22,11 @@ public class ParserUtils {
      * @return
      */
     public List<String> stringToList(String items) {
-        List<String> list = new ArrayList<>();
-        list.addAll(Arrays.asList(items.split(DELIMITTER)));
-        return list;
+        return new ArrayList<>(Arrays.asList(items.split(DELIMITTER)));
     }
 
     public Boolean isExpected(List<String> items, String[] expectedValues) {
-        for(String item: items) {
-            if (!isExpected(item, expectedValues)) {
-                return Boolean.FALSE;
-            }
-        }
-        return Boolean.TRUE;
+        return items.stream().anyMatch(a -> isExpected(a, expectedValues));
     }
 
     public Boolean isExpected(String item, String[] expectedValues) {

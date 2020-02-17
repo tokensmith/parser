@@ -1,7 +1,6 @@
 package net.tokensmith.parser;
 
 import net.tokensmith.parser.builder.exception.ConstructException;
-import net.tokensmith.parser.exception.DataTypeException;
 import net.tokensmith.parser.exception.OptionalException;
 import net.tokensmith.parser.exception.RequiredException;
 import net.tokensmith.parser.exception.ValueException;
@@ -33,7 +32,7 @@ class ParserTest {
             "string", "id", "uri",
             "strings", "ids", "uris",
             "optString", "optId", "optUri",
-            "optList"
+            "optList", "nested"
     );
 
     @BeforeEach
@@ -47,7 +46,7 @@ class ParserTest {
             }
         });
 
-        subject = new Parser<Dummy>(
+        subject = new Parser<>(
                 new OptionalParam(), new RequiredParam(), new TypeParserFactory<Dummy>(), builders
         );
     }

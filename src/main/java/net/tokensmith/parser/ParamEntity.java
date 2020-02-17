@@ -2,6 +2,7 @@ package net.tokensmith.parser;
 
 
 import java.lang.reflect.Field;
+import java.util.List;
 import java.util.function.Function;
 
 
@@ -14,16 +15,18 @@ public class ParamEntity {
     private Boolean isList;
     private Boolean isOptional;
     private Function<String, Object> builder;
+    private List<ParamEntity> children;
 
 
-    public ParamEntity(Field field, Parameter parameter, Boolean isParameterized, Function<String, Object> builder) {
+    public ParamEntity(Field field, Parameter parameter, Boolean isParameterized, Function<String, Object> builder, List<ParamEntity> children) {
         this.field = field;
         this.parameter = parameter;
         this.parameterized = isParameterized;
         this.builder = builder;
+        this.children = children;
     }
 
-    public ParamEntity(Field field, Parameter parameter, Boolean parameterized, String rawType, String argType, Boolean isList, Boolean isOptional, Function<String, Object> builder) {
+    public ParamEntity(Field field, Parameter parameter, Boolean parameterized, String rawType, String argType, Boolean isList, Boolean isOptional, Function<String, Object> builder, List<ParamEntity> children) {
         this.field = field;
         this.parameter = parameter;
         this.parameterized = parameterized;
@@ -32,6 +35,7 @@ public class ParamEntity {
         this.isList = isList;
         this.isOptional = isOptional;
         this.builder = builder;
+        this.children = children;
     }
 
     public Field getField() {
@@ -96,5 +100,13 @@ public class ParamEntity {
 
     public void setBuilder(Function<String, Object> builder) {
         this.builder = builder;
+    }
+
+    public List<ParamEntity> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<ParamEntity> children) {
+        this.children = children;
     }
 }
