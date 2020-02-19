@@ -56,8 +56,6 @@ public class Parser<T extends Parsable> {
      * @throws ParseException
      */
     public T to(Class<T> clazz, List<ParamEntity> fields, Map<String, List<String>> params) throws RequiredException, OptionalException, ParseException {
-        // need to translate params to tree for this to work..
-        // https://stackoverflow.com/questions/3522454/java-tree-data-structure
 
         T to;
         try {
@@ -170,7 +168,7 @@ public class Parser<T extends Parsable> {
         return (field.getGenericType() instanceof ParameterizedType);
     }
 
-    public Function<String, Object> builderForField(String className) {
+    protected Function<String, Object> builderForField(String className) {
         Function<String, Object> builder = builders.get(className);
         if (builder == null) {
             Constructor<?> ctor = ctorForField(className);
@@ -180,7 +178,7 @@ public class Parser<T extends Parsable> {
         return builder;
     }
 
-    public Constructor<?> ctorForField(String className) {
+    protected Constructor<?> ctorForField(String className) {
         Class<?> target;
         try {
             target = Class.forName(className);
