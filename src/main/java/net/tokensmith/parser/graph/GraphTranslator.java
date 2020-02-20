@@ -15,13 +15,12 @@ public class GraphTranslator {
 
     public Map<String, GraphNode<NodeData>> to(Map<String, List<String>> from) {
 
-        // used only to have faster look ups for insert as child.
         Map<String, GraphNode<NodeData>> to = new HashMap<>();
 
         for(Map.Entry<String, List<String>> entry: from.entrySet()) {
             List<String> parsedKeys = matches(entry.getKey());
 
-            if (parsedKeys.size() > 0) {
+            if (parsedKeys.size() > 1) {
                 // add with traversal
                 GraphNode<NodeData> rootNode = to.get(parsedKeys.get(0));
                 String dataKey = parsedKeys.get(parsedKeys.size()-1);

@@ -48,20 +48,33 @@ public class Parser<T extends Parsable> {
     }
 
     /**
-     * Translates params to an instance of clazz. The definition of class must be annotated
-     * with @Parameter on the field level.
+     * Translates from to an instance of T. The definition of class must have annotations on the ivars
+     * with @Parameter.
      *
-     * @param clazz
-     * @param fields
-     * @param from
-     * @return a new instance of clazz
-     * @throws RequiredException
+     * @param clazz the Class that is returned
+     * @param fields the List that returned by reflect(Class clazz)
+     * @param from the data to translate to T
+     * @return a new instance of T
+     * @throws RequiredException if a field that is required is not
      * @throws OptionalException
      * @throws ParseException
      */
     public T to(Class<T> clazz, List<ParamEntity> fields, Map<String, List<String>> from) throws RequiredException, OptionalException, ParseException {
-
         Map<String, GraphNode<NodeData>> fromGraph = graphTranslator.to(from);
+        return toFromGraph(clazz, fields, fromGraph);
+    }
+
+    /**
+     *
+     * @param clazz
+     * @param fields
+     * @param from
+     * @return
+     * @throws RequiredException
+     * @throws OptionalException
+     * @throws ParseException
+     */
+    public T toFromGraph(Class<T> clazz, List<ParamEntity> fields, Map<String, GraphNode<NodeData>> from) throws RequiredException, OptionalException, ParseException {
 
         T to;
         try {
@@ -78,10 +91,12 @@ public class Parser<T extends Parsable> {
             Parameter p = field.getParameter();
 
             // key to use to assign values to f.
-            GraphNode<NodeData> node = fromGraph.get(p.name());
+            GraphNode<NodeData> node = from.get(p.name());
 
-            // does this node have data? if not recurse.
-            List<String> fromValues = node.getData().getValues();
+            List<String> fromValues = null;
+            if (node != null) {
+                fromValues = node.getData().getValues();
+            }
 
             try {
                 validate(f.getName(), p.name(), fromValues, p.required());
@@ -94,11 +109,12 @@ public class Parser<T extends Parsable> {
             }
 
             Boolean inputEmpty = isEmpty(fromValues);
-            TypeParser<T> parser = typeParserFactory.make(field, inputEmpty);
+            TypeParser<T> parser = typeParserFactory.make(field, inputEmpty, p.required());
             parser.parse(to, field, fromValues);
         }
         return to;
     }
+
 
     public boolean validate(String field, String param, List<String> input, boolean required) throws RequiredException, OptionalException {
         boolean validated;
@@ -169,7 +185,6 @@ public class Parser<T extends Parsable> {
                 fields.add(node);
             }
         }
-
         return fields;
     }
 
