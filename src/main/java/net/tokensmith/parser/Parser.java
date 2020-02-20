@@ -7,6 +7,9 @@ import net.tokensmith.parser.exception.ParseException;
 import net.tokensmith.parser.exception.RequiredException;
 import net.tokensmith.parser.factory.TypeParser;
 import net.tokensmith.parser.factory.TypeParserFactory;
+import net.tokensmith.parser.graph.GraphNode;
+import net.tokensmith.parser.graph.GraphTranslator;
+import net.tokensmith.parser.model.NodeData;
 import net.tokensmith.parser.validator.OptionalParam;
 import net.tokensmith.parser.validator.RawType;
 import net.tokensmith.parser.validator.RequiredParam;
@@ -30,13 +33,14 @@ public class Parser<T extends Parsable> {
     private static String TO_OBJ_ERROR = "Could not construct to object";
     private static String REQ_ERROR="Required field failed validation";
     private static String OPT_ERROR="Optional field failed validation";
+    private GraphTranslator graphTranslator;
     private OptionalParam optionalParam;
     private RequiredParam requiredParam;
     private TypeParserFactory<T> typeParserFactory;
     private Map<String, Function<String, Object>> builders;
 
-
-    public Parser(OptionalParam optionalParam, RequiredParam requiredParam, TypeParserFactory<T> typeParserFactory, Map<String, Function<String, Object>> builders) {
+    public Parser(GraphTranslator graphTranslator, OptionalParam optionalParam, RequiredParam requiredParam, TypeParserFactory<T> typeParserFactory, Map<String, Function<String, Object>> builders) {
+        this.graphTranslator = graphTranslator;
         this.optionalParam = optionalParam;
         this.requiredParam = requiredParam;
         this.typeParserFactory = typeParserFactory;
@@ -49,13 +53,15 @@ public class Parser<T extends Parsable> {
      *
      * @param clazz
      * @param fields
-     * @param params
+     * @param from
      * @return a new instance of clazz
      * @throws RequiredException
      * @throws OptionalException
      * @throws ParseException
      */
-    public T to(Class<T> clazz, List<ParamEntity> fields, Map<String, List<String>> params) throws RequiredException, OptionalException, ParseException {
+    public T to(Class<T> clazz, List<ParamEntity> fields, Map<String, List<String>> from) throws RequiredException, OptionalException, ParseException {
+
+        Map<String, GraphNode<NodeData>> fromGraph = graphTranslator.to(from);
 
         T to;
         try {
@@ -72,10 +78,13 @@ public class Parser<T extends Parsable> {
             Parameter p = field.getParameter();
 
             // key to use to assign values to f.
-            List<String> from = params.get(p.name());
+            GraphNode<NodeData> node = fromGraph.get(p.name());
+
+            // does this node have data? if not recurse.
+            List<String> fromValues = node.getData().getValues();
 
             try {
-                validate(f.getName(), p.name(), from, p.required());
+                validate(f.getName(), p.name(), fromValues, p.required());
             } catch (OptionalException e) {
                 e.setTarget(to);
                 throw e;
@@ -84,9 +93,9 @@ public class Parser<T extends Parsable> {
                 throw e;
             }
 
-            Boolean inputEmpty = isEmpty(from);
+            Boolean inputEmpty = isEmpty(fromValues);
             TypeParser<T> parser = typeParserFactory.make(field, inputEmpty);
-            parser.parse(to, field, from);
+            parser.parse(to, field, fromValues);
         }
         return to;
     }

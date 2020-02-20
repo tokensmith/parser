@@ -19,6 +19,14 @@ public class GraphNode<T> {
         this.children = children;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public T getData() {
+        return data;
+    }
+
     public void addChild(String key, GraphNode<T> child) {
         this.children.put(key, child);
     }

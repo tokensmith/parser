@@ -5,6 +5,7 @@ import net.tokensmith.parser.exception.OptionalException;
 import net.tokensmith.parser.exception.RequiredException;
 import net.tokensmith.parser.exception.ValueException;
 import net.tokensmith.parser.factory.TypeParserFactory;
+import net.tokensmith.parser.graph.GraphTranslator;
 import net.tokensmith.parser.helper.FixtureFactory;
 import net.tokensmith.parser.validator.Dummy;
 import net.tokensmith.parser.validator.OptionalParam;
@@ -48,7 +49,7 @@ class ParserTest {
         });
 
         subject = new Parser<>(
-                new OptionalParam(), new RequiredParam(), new TypeParserFactory<Dummy>(), builders
+            new GraphTranslator(), new OptionalParam(), new RequiredParam(), new TypeParserFactory<>(), builders
         );
     }
 
