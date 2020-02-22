@@ -1,9 +1,7 @@
-package net.tokensmith.parser.factory;
+package net.tokensmith.parser.factory.simple;
 
 import net.tokensmith.parser.ParamEntity;
 import net.tokensmith.parser.ParserUtils;
-import net.tokensmith.parser.builder.exception.ConstructException;
-import net.tokensmith.parser.exception.DataTypeException;
 import net.tokensmith.parser.exception.OptionalException;
 import net.tokensmith.parser.exception.ParseException;
 import net.tokensmith.parser.exception.RequiredException;
@@ -12,17 +10,17 @@ import net.tokensmith.parser.exception.ValueException;
 import java.util.List;
 import java.util.Optional;
 
-public class ReferenceTypeParser<T> implements TypeParser<T> {
+public class OptionalParser implements TypeParser {
     private static String FIELD_ERROR = "Could not set field value";
     private String UNSUPPORTED_ERROR = "input value is not supported";
     private ParserUtils parserUtils;
 
-    public ReferenceTypeParser(ParserUtils parserUtils) {
+    public OptionalParser(ParserUtils parserUtils) {
         this.parserUtils = parserUtils;
     }
 
     @Override
-    public void parse(T to, ParamEntity toField, List<String> from) throws ParseException, RequiredException, OptionalException {
+    public <T> void parse(T to, ParamEntity toField, List<String> from) throws ParseException, RequiredException, OptionalException {
         List<String> parsedValues = parserUtils.stringToList(from.get(0));
         Boolean inputOk = parserUtils.isExpected(parsedValues, toField.getParameter().expected());
 
@@ -37,9 +35,8 @@ public class ReferenceTypeParser<T> implements TypeParser<T> {
         } catch (Exception e) {
             parserUtils.handleConstructorException(e, toField, to);
         }
-
         try {
-            toField.getField().set(to, item);
+            toField.getField().set(to, Optional.of(item));
         } catch (IllegalAccessException e) {
             throw new ParseException(FIELD_ERROR, e);
         }

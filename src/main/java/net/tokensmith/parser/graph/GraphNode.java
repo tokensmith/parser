@@ -39,6 +39,10 @@ public class GraphNode<T> {
         return children;
     }
 
+    public Boolean hasChildren() {
+        return this.getChildren().size() > 0;
+    }
+
     public GraphNode<T> insert(ListIterator<String> keys, T data) {
         if(keys.hasNext()) {
             String key = keys.next();

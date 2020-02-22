@@ -41,8 +41,11 @@ public class Dummy implements Parsable {
 
     private String notAnnotated;
 
-    @Parameter(name="nested", required = false)
+    @Parameter(name="nested")
     private DummyTwo nested;
+
+    @Parameter(name="opt_nested", required = false)
+    private Optional<DummyTwo> optNested;
 
     public String getString() {
         return string;
@@ -130,5 +133,21 @@ public class Dummy implements Parsable {
 
     public void setNotAnnotated(String notAnnotated) {
         this.notAnnotated = notAnnotated;
+    }
+
+    public DummyTwo getNested() {
+        return nested;
+    }
+
+    public void setNested(DummyTwo nested) {
+        this.nested = nested;
+    }
+
+    public Optional<DummyTwo> getOptNested() {
+        return optNested;
+    }
+
+    public void setOptNested(Optional<DummyTwo> optNested) {
+        this.optNested = optNested;
     }
 }

@@ -45,4 +45,9 @@ public class RequiredException extends Exception {
     public void setTarget(Object target) {
         this.target = target;
     }
+
+    @Override
+    public String toString() {
+        return String.format("%s. field: %s, param: %s", getMessage(), getField(), getParam());
+    }
 }

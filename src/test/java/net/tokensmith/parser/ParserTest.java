@@ -4,7 +4,8 @@ import net.tokensmith.parser.builder.exception.ConstructException;
 import net.tokensmith.parser.exception.OptionalException;
 import net.tokensmith.parser.exception.RequiredException;
 import net.tokensmith.parser.exception.ValueException;
-import net.tokensmith.parser.factory.TypeParserFactory;
+import net.tokensmith.parser.factory.nested.NestedTypeSetterFactory;
+import net.tokensmith.parser.factory.simple.TypeParserFactory;
 import net.tokensmith.parser.graph.GraphTranslator;
 import net.tokensmith.parser.helper.FixtureFactory;
 import net.tokensmith.parser.validator.Dummy;
@@ -27,7 +28,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ParserTest {
 
-    private Parser<Dummy> subject;
+    private Parser subject;
+    private ReflectParameter reflectParameter;
 
     // names of fields expected
     private List<String> names = Arrays.asList(
@@ -47,28 +49,18 @@ class ParserTest {
                 throw new ConstructException("", e);
             }
         });
-
-        subject = new Parser<>(
-            new GraphTranslator(), new OptionalParam(), new RequiredParam(), new TypeParserFactory<>(), builders
+        reflectParameter = new ReflectParameter(builders);
+        subject = new Parser(
+            new GraphTranslator(), new OptionalParam(), new RequiredParam(), new TypeParserFactory(), new NestedTypeSetterFactory()
         );
     }
 
-    @Test
-    public void reflectShouldFindAllFields() throws Exception {
-        List<ParamEntity> actuals = subject.reflect(Dummy.class);
-        assertNotNull(actuals);
-        assertEquals(actuals.size(), names.size());
 
-        for(ParamEntity actual: actuals) {
-            boolean found = names.contains(actual.getField().getName());
-            assertTrue(found, "could not find field: " + actual.getField().getName());
-        }
-    }
 
     @Test
     public void toShouldTranslate() throws Exception {
-        List<ParamEntity> fields = subject.reflect(Dummy.class);
-        Map<String, List<String>> params = FixtureFactory.makeNotNestedParameters();
+        List<ParamEntity> fields = reflectParameter.reflect(Dummy.class);
+        Map<String, List<String>> params = FixtureFactory.makeForDummyNestedParameters();
 
         Dummy actual = subject.to(Dummy.class, fields, params);
 
@@ -121,12 +113,14 @@ class ParserTest {
 
         // not annotated field - should not have been assigned.
         assertNull(actual.getNotAnnotated());
+
+        // TODO: need to inspect nested.
     }
 
     @Test
     public void toWhenTypeOptionalEmptyListShouldTranslate() throws Exception {
-        List<ParamEntity> fields = subject.reflect(Dummy.class);
-        Map<String, List<String>> params = FixtureFactory.makeNotNestedParameters();
+        List<ParamEntity> fields = reflectParameter.reflect(Dummy.class);
+        Map<String, List<String>> params = FixtureFactory.makeForDummyNestedParameters();
         params.put("opt_uuid", new ArrayList<>());
 
         Dummy actual = (Dummy) subject.to(Dummy.class, fields, params);
@@ -139,8 +133,8 @@ class ParserTest {
 
     @Test
     public void toWhenTypeListEmptyListShouldTranslate() throws Exception {
-        List<ParamEntity> fields = subject.reflect(Dummy.class);
-        Map<String, List<String>> params = FixtureFactory.makeNotNestedParameters();
+        List<ParamEntity> fields = reflectParameter.reflect(Dummy.class);
+        Map<String, List<String>> params = FixtureFactory.makeForDummyNestedParameters();
         params.put("opt_list", new ArrayList<>());
 
         Dummy actual = (Dummy) subject.to(Dummy.class, fields, params);
@@ -153,10 +147,10 @@ class ParserTest {
 
     @Test
     public void toWhenOptFieldIsMissingShouldMakeAEmptyValue() throws Exception {
-        List<ParamEntity> fields = subject.reflect(Dummy.class);
+        List<ParamEntity> fields = reflectParameter.reflect(Dummy.class);
 
         // modify uuids to have a empty value at index 0
-        Map<String, List<String>> params = FixtureFactory.makeNotNestedParameters();
+        Map<String, List<String>> params = FixtureFactory.makeForDummyNestedParameters();
         params.remove("opt_uuid");
 
         Dummy actual = subject.to(Dummy.class, fields, params);
@@ -168,7 +162,7 @@ class ParserTest {
 
     @Test
     public void toWhenMissingReqFieldShouldThrowRequiredException() throws Exception {
-        List<ParamEntity> fields = subject.reflect(Dummy.class);
+        List<ParamEntity> fields = reflectParameter.reflect(Dummy.class);
 
         // remove the key, string
         Map<String, List<String>> params = FixtureFactory.makeNotNestedParameters();
@@ -192,7 +186,7 @@ class ParserTest {
 
     @Test
     public void toWhenReqFieldHasInvalidValueThrowRequiredException() throws Exception {
-        List<ParamEntity> fields = subject.reflect(Dummy.class);
+        List<ParamEntity> fields = reflectParameter.reflect(Dummy.class);
 
         // remove the key, string
         Map<String, List<String>> params = FixtureFactory.makeNotNestedParameters();
@@ -222,7 +216,7 @@ class ParserTest {
 
     @Test
     public void toWhenOptFieldIsEmptyShouldThrowOptionalException() throws Exception {
-        List<ParamEntity> fields = subject.reflect(Dummy.class);
+        List<ParamEntity> fields = reflectParameter.reflect(Dummy.class);
 
         // modify uuids to have a empty value at index 0
         Map<String, List<String>> params = FixtureFactory.makeNotNestedParameters();
@@ -285,7 +279,7 @@ class ParserTest {
 
     @Test
     public void toWhenReqFieldInvalidValueShouldThrowRequiredException() throws Exception {
-        List<ParamEntity> fields = subject.reflect(Dummy.class);
+        List<ParamEntity> fields = reflectParameter.reflect(Dummy.class);
         Map<String, List<String>> params = FixtureFactory.makeNotNestedParameters();
         params.put("uuid", Arrays.asList("invalid-uuid"));
 
@@ -313,7 +307,7 @@ class ParserTest {
 
     @Test
     public void toWhenOptFieldInvalidValueShouldThrowOptionalException() throws Exception {
-        List<ParamEntity> fields = subject.reflect(Dummy.class);
+        List<ParamEntity> fields = reflectParameter.reflect(Dummy.class);
         Map<String, List<String>> params = FixtureFactory.makeNotNestedParameters();
         params.put("opt_uuid", Arrays.asList("invalid-uuid"));
 
@@ -334,6 +328,28 @@ class ParserTest {
         assertNotNull(actualCause);
         assertTrue(actualCause.getCause() instanceof IllegalArgumentException);
 
+        Dummy actual = (Dummy) actualException.getTarget();
+
+        assertNotNull(actual);
+    }
+
+    @Test
+    public void toWhenMissingReqNestedFieldShouldThrowRequiredException() throws Exception {
+        List<ParamEntity> fields = reflectParameter.reflect(Dummy.class);
+
+        Map<String, List<String>> params = FixtureFactory.makeNotNestedParameters();
+
+        RequiredException actualException = null;
+        try {
+            subject.to(Dummy.class, fields, params);
+        } catch (RequiredException e) {
+            actualException = e;
+        }
+
+        assertNotNull(actualException);
+        assertEquals("nested", actualException.getField());
+        assertNull(actualException.getParam());
+        assertTrue(actualException.getCause() instanceof ParamIsNullError);
         Dummy actual = (Dummy) actualException.getTarget();
 
         assertNotNull(actual);

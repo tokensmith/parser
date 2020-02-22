@@ -5,7 +5,6 @@ import net.tokensmith.parser.model.NodeData;
 import org.junit.jupiter.api.Test;
 
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -40,7 +39,7 @@ class GraphTranslatorTest {
 
     @Test
     public void toWhenNestedShouldTranslate() {
-        Map<String, List<String>> from = FixtureFactory.makeNestedParameters();
+        Map<String, List<String>> from = FixtureFactory.makeAllNestedParameters();
 
         Map<String, GraphNode<NodeData>> actual = subject().to(from);
 

@@ -1,23 +1,23 @@
-package net.tokensmith.parser.factory;
+package net.tokensmith.parser.factory.simple;
 
 import net.tokensmith.parser.ParamEntity;
 import net.tokensmith.parser.ParserUtils;
 
-public class TypeParserFactory<T> {
+public class TypeParserFactory {
 
-    public TypeParser<T> make(ParamEntity toField, Boolean inputEmpty, Boolean required) {
+    public TypeParser make(ParamEntity toField, Boolean inputEmpty, Boolean required) {
         if(toField.isParameterized() && inputEmpty && toField.isList()) {
-            return new EmptyListParser<T>();
+            return new EmptyListParser();
         } else if (toField.isParameterized() && inputEmpty && toField.isOptional()) {
-            return new EmptyOptionalParser<T>();
+            return new EmptyOptionalParser();
         } else if (toField.isParameterized() && !inputEmpty && toField.isList()) {
-            return new ListParser<T>(new ParserUtils());
+            return new ListParser(new ParserUtils());
         } else if (toField.isParameterized() && !inputEmpty && toField.isOptional()) {
-            return new OptionalParser<T>(new ParserUtils());
+            return new OptionalParser(new ParserUtils());
         } else if (!inputEmpty && required) {
-            return new ReferenceTypeParser<T>(new ParserUtils());
+            return new ReferenceTypeParser(new ParserUtils());
         } else {
-            return new ReferenceTypeNullParser<T>();
+            return new ReferenceTypeNullParser();
         }
     }
 }
