@@ -11,6 +11,4 @@ class ParserUtilsTest {
     public void setUp() {
         subject = new ParserUtils();
     }
-
-
 }

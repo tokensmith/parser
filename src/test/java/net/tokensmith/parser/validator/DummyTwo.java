@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class Dummy {
+public class DummyTwo {
     @Parameter(name="string", expected = {"string1"})
     private String string;
 
@@ -40,12 +40,6 @@ public class Dummy {
     private List<String> optList;
 
     private String notAnnotated;
-
-    @Parameter(name="nested", nested = true)
-    private DummyTwo nested;
-
-    @Parameter(name="opt_nested", nested = true, required = false)
-    private Optional<DummyTwo> optNested;
 
     public String getString() {
         return string;
@@ -133,21 +127,5 @@ public class Dummy {
 
     public void setNotAnnotated(String notAnnotated) {
         this.notAnnotated = notAnnotated;
-    }
-
-    public DummyTwo getNested() {
-        return nested;
-    }
-
-    public void setNested(DummyTwo nested) {
-        this.nested = nested;
-    }
-
-    public Optional<DummyTwo> getOptNested() {
-        return optNested;
-    }
-
-    public void setOptNested(Optional<DummyTwo> optNested) {
-        this.optNested = optNested;
     }
 }

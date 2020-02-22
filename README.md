@@ -1,2 +1,2 @@
 # parser
-Parses HTTP inputs to POJOs
+Parses url params to POJOS
