@@ -22,7 +22,7 @@ class ReflectParameterTest {
             "string", "id", "uri",
             "strings", "ids", "uris",
             "optString", "optId", "optUri",
-            "optList", "nested"
+            "optList", "nested", "optNested"
     );
 
     @BeforeEach

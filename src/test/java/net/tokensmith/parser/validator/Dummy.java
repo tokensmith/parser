@@ -1,14 +1,14 @@
 package net.tokensmith.parser.validator;
 
 import net.tokensmith.parser.Parameter;
-import net.tokensmith.parser.Parsable;
+
 
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class Dummy implements Parsable {
+public class Dummy {
     @Parameter(name="string", expected = {"string1"})
     private String string;
 
@@ -41,10 +41,10 @@ public class Dummy implements Parsable {
 
     private String notAnnotated;
 
-    @Parameter(name="nested")
+    @Parameter(name="nested", nested = true)
     private DummyTwo nested;
 
-    @Parameter(name="opt_nested", required = false)
+    @Parameter(name="opt_nested", nested = true, required = false)
     private Optional<DummyTwo> optNested;
 
     public String getString() {

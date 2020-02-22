@@ -14,5 +14,6 @@ import java.util.function.Function;
 public @interface Parameter {
     String name();
     boolean required() default true;
+    boolean nested() default false;
     String[] expected() default {};
 }

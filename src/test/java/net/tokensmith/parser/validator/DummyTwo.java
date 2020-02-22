@@ -1,14 +1,14 @@
 package net.tokensmith.parser.validator;
 
 import net.tokensmith.parser.Parameter;
-import net.tokensmith.parser.Parsable;
+
 
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class DummyTwo implements Parsable {
+public class DummyTwo {
     @Parameter(name="string", expected = {"string1"})
     private String string;
 

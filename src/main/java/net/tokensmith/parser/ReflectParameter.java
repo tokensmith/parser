@@ -68,7 +68,7 @@ public class ReflectParameter {
                             .build();
                 }
 
-                if (nodeClazz != null && Parsable.class.isAssignableFrom(nodeClazz)){
+                if (nodeClazz != null && p.nested()){
                     children = reflect(nodeClazz);
                 }
 
