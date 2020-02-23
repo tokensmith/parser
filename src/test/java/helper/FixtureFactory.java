@@ -1,4 +1,4 @@
-package net.tokensmith.parser.helper;
+package helper;
 
 import java.util.Arrays;
 import java.util.HashMap;

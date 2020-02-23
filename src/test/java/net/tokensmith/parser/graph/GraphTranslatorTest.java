@@ -1,6 +1,6 @@
 package net.tokensmith.parser.graph;
 
-import net.tokensmith.parser.helper.FixtureFactory;
+import helper.FixtureFactory;
 import net.tokensmith.parser.model.NodeData;
 import org.junit.jupiter.api.Test;
 
