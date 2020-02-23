@@ -1,7 +1,7 @@
 package net.tokensmith.parser;
 
 import net.tokensmith.parser.builder.exception.ConstructException;
-import net.tokensmith.parser.validator.Dummy;
+import helper.Dummy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

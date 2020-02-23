@@ -25,7 +25,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+
 
 
 public class Parser {
@@ -48,16 +48,16 @@ public class Parser {
     }
 
     /**
-     * Translates from to an instance of T. The definition of class must have annotations on the ivars
-     * with @Parameter.
+     * Translates from to an instance of T.
      *
      * @param clazz the Class that is returned
      * @param fields the List that returned by reflect(Class clazz)
      * @param from the data to translate to T
+     * @param <T> the type to translate to
      * @return a new instance of T
-     * @throws RequiredException if a field that is required is not
-     * @throws OptionalException
-     * @throws ParseException
+     * @throws RequiredException if a field that is required is empty, null, or not present
+     * @throws OptionalException if a field that is optional is present and empty or null. If its there it should have a value.
+     * @throws ParseException if something went wrong in the framework.
      */
     public <T> T to(Class<T> clazz, List<ParamEntity> fields, Map<String, List<String>> from) throws RequiredException, OptionalException, ParseException {
         Map<String, GraphNode<NodeData>> fromGraph = graphTranslator.to(from);
@@ -65,14 +65,16 @@ public class Parser {
     }
 
     /**
+     * Translates from to an instance of T.
      *
-     * @param clazz
-     * @param fields
-     * @param from
-     * @return
-     * @throws RequiredException
-     * @throws OptionalException
-     * @throws ParseException
+     * @param clazz the Class that is returned
+     * @param fields the List that returned by reflect(Class clazz)
+     * @param from the data to translate to T, in the form of a graph.
+     * @param <T> the type to translate to
+     * @return a new instance of T
+     * @throws RequiredException if a field that is required is empty, null, or not present
+     * @throws OptionalException if a field that is optional is present and empty or null. If its there it should have a value.
+     * @throws ParseException if something went wrong in the framework.
      */
     public <T> T toFromGraph(Class<T> clazz, List<ParamEntity> fields, Map<String, GraphNode<NodeData>> from) throws RequiredException, OptionalException, ParseException {
 
@@ -89,7 +91,6 @@ public class Parser {
 
             // parameter settings for the ivar
             Parameter p = field.getParameter();
-
 
             GraphNode<NodeData> node = from.get(p.name());
 

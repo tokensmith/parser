@@ -18,10 +18,10 @@ public class OptionalParam {
      *  - items first element cannot be empty (implies an empty value, it must have a non empty value)
      *  - items cannot have more than one value (per OAUTH2)
      *
-     * @param items
+     * @param items the input to validate
      * @return true if passes. raises exception if fails.
-     * @throws EmptyValueError
-     * @throws MoreThanOneItemError
+     * @throws EmptyValueError if items contains an empty string value
+     * @throws MoreThanOneItemError if items has more than one item.
      */
     public boolean run(List<String> items) throws EmptyValueError, MoreThanOneItemError {
 

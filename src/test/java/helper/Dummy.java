@@ -1,4 +1,4 @@
-package net.tokensmith.parser.validator;
+package helper;
 
 import net.tokensmith.parser.Parameter;
 
