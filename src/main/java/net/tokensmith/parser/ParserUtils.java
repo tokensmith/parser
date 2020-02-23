@@ -18,8 +18,8 @@ public class ParserUtils {
      * OAuth2 will pass in a space delimited string for a url parameter value
      * That should be parsed into a list.
      *
-     * @param items
-     * @return
+     * @param items converts a string delimitted by a white space to a List
+     * @return a list of strings
      */
     public List<String> stringToList(String items) {
         return new ArrayList<>(Arrays.asList(items.split(DELIMITTER)));

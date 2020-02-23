@@ -24,12 +24,12 @@ public class RequiredParam {
      *  - items first element cannot be empty
      *  - items cannot have more than one value (per OAUTH2)
      *
-     * @param items
+     * @param items the input to validate
      * @return true if passes. raises exception if fails.
-     * @throws EmptyValueError
-     * @throws MoreThanOneItemError
-     * @throws NoItemsError
-     * @throws ParamIsNullError
+     * @throws EmptyValueError if items contains an empty string
+     * @throws MoreThanOneItemError if items has more than one item
+     * @throws NoItemsError if items has no values
+     * @throws ParamIsNullError if items is null
      */
     public boolean run(List<String> items) throws EmptyValueError, MoreThanOneItemError, NoItemsError, ParamIsNullError {
 
