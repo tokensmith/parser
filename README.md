@@ -1,24 +1,22 @@
 # parser
 Parses url params to POJOS
 
+## Coordinates
+#### Gradle
+```groovy
+compile group: 'net.tokensmith', name: 'parser', version: '0.0.1-SNAPSHOT'
+```
+
 ## Usage
 
 ### Annotation
 Annotate the class fields that should be translated with `@Parameter`
 
 It accepts the following:
-
-#### name
- url param key
- 
-#### required
- true/false
-
-#### nested
- true/false. If true, then it will traverse this field's type. Nested keys are delimitted by a `.` such as, `foo.id`. The first `@Parameter` name value would be `foo` then field's in `foo` would only have it's immediate key name `id`, etc.   
-
-#### expected
- An array of strings. The input must be one of the provided values.
+ - name: url param key
+ - required: true/false
+ - nested: true/false. If true, then it will traverse this field's type. Nested keys are delimitted by a `.` such as, `foo.id`. The first `@Parameter` name value would be `foo` then field's in `foo` would only have it's immediate key name `id`, etc.   
+ - expected: An array of strings. The input must be one of the provided values.
 
 An [example](src/test/java/helper/Dummy.java) can be found in the test suite.
 
@@ -46,10 +44,4 @@ Perform the translation.
 Map<String, List<String>> params = new HashMap();
 
 Dummy actual = subject.to(Dummy.class, fields, params);
-```
-
-## Coordinates
-#### Gradle
-```groovy
-compile group: 'net.tokensmith', name: 'parser', version: '0.0.1-SNAPSHOT'
 ```
