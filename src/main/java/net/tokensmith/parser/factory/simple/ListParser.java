@@ -8,7 +8,9 @@ import net.tokensmith.parser.exception.RequiredException;
 import net.tokensmith.parser.exception.ValueException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ListParser implements TypeParser {
     private static String FIELD_ERROR = "Could not set field value";
@@ -21,8 +23,16 @@ public class ListParser implements TypeParser {
 
     @Override
     public <T> void parse(T to, ParamEntity toField, List<String> from) throws ParseException, RequiredException, OptionalException {
-        List<String> parsedValues = parserUtils.stringToList(from.get(0));
-        Boolean inputOk = parserUtils.isExpected(parsedValues, toField.getParameter().expected());
+        List<String> fromParsed = new ArrayList<>();
+        if (toField.getParameter().parsable()) {
+            for(String fromValue: from) {
+                fromParsed.addAll(parserUtils.stringToList(fromValue, toField.getParameter().delimitter()));
+            }
+        } else {
+            fromParsed = from;
+        }
+
+        Boolean inputOk = parserUtils.isExpected(fromParsed, toField.getParameter().expected());
 
         if(!inputOk) {
             ValueException ve = new ValueException(UNSUPPORTED_ERROR, toField.getField().getName(), toField.getParameter().name(), from.get(0));
@@ -30,7 +40,7 @@ public class ListParser implements TypeParser {
         }
 
         ArrayList<Object> arrayList = new ArrayList<>();
-        for (String parsedValue : parsedValues) {
+        for (String parsedValue : fromParsed) {
             Object item = null;
             try {
                 item = toField.getBuilder().apply(parsedValue);

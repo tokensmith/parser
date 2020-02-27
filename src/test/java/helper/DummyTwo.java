@@ -18,7 +18,7 @@ public class DummyTwo {
     @Parameter(name="uri")
     private URI uri;
 
-    @Parameter(name="strings", expected = {"string1", "string2", "string3"})
+    @Parameter(name="strings", parsable = true, expected = {"string1", "string2", "string3"})
     private List<String> strings;
 
     @Parameter(name="uuids")
@@ -36,7 +36,7 @@ public class DummyTwo {
     @Parameter(name="opt_uri", required = false)
     private Optional<URI> optUri;
 
-    @Parameter(name="opt_list", required = false)
+    @Parameter(name="opt_list", parsable = true, required = false)
     private List<String> optList;
 
     private String notAnnotated;

@@ -117,7 +117,7 @@ public class Parser {
                 }
 
                 try {
-                    validate(f.getName(), p.name(), fromValues, p.required());
+                    validate(f.getName(), p.name(), fromValues, p.required(), p.allowMany());
                 } catch (OptionalException e) {
                     e.setTarget(to);
                     throw e;
@@ -135,17 +135,17 @@ public class Parser {
         return to;
     }
 
-    protected boolean validate(String field, String param, List<String> input, boolean required) throws RequiredException, OptionalException {
+    protected boolean validate(String field, String param, List<String> input, boolean required, boolean allowMany) throws RequiredException, OptionalException {
         boolean validated;
         if (required) {
             try {
-                validated = requiredParam.run(input);
+                validated = requiredParam.run(input, allowMany);
             } catch (EmptyValueError | MoreThanOneItemError | NoItemsError | ParamIsNullError e) {
                 throw new RequiredException(REQ_ERROR, e, field, param);
             }
         } else {
             try {
-                validated = optionalParam.run(input);
+                validated = optionalParam.run(input, allowMany);
             } catch (EmptyValueError | MoreThanOneItemError e) {
                 throw new OptionalException(OPT_ERROR, e, field, param);
             }

@@ -25,13 +25,14 @@ public class RequiredParam {
      *  - items cannot have more than one value (per OAUTH2)
      *
      * @param items the input to validate
+     * @param allowMany if many items are allowed in the input
      * @return true if passes. raises exception if fails.
      * @throws EmptyValueError if items contains an empty string
      * @throws MoreThanOneItemError if items has more than one item
      * @throws NoItemsError if items has no values
      * @throws ParamIsNullError if items is null
      */
-    public boolean run(List<String> items) throws EmptyValueError, MoreThanOneItemError, NoItemsError, ParamIsNullError {
+    public boolean run(List<String> items, boolean allowMany) throws EmptyValueError, MoreThanOneItemError, NoItemsError, ParamIsNullError {
 
         if(items == null) {
             throw new ParamIsNullError(IS_NULL);
@@ -45,7 +46,7 @@ public class RequiredParam {
             throw new EmptyValueError(EMPTY);
         }
 
-        if(items.size() > 1) {
+        if(!allowMany && items.size() > 1) {
             throw new MoreThanOneItemError(TOO_MANY_VALUES);
         }
 

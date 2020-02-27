@@ -32,7 +32,7 @@ class RequiredParamTest {
     public void runWithOneItemShouldBeOk() throws Exception {
         List<String> items = makeItems();
 
-        boolean actual = subject.run(items);
+        boolean actual = subject.run(items, false);
         assertTrue(actual);
     }
 
@@ -41,7 +41,7 @@ class RequiredParamTest {
         List<String> items = null;
 
         Assertions.assertThrows(ParamIsNullError.class, () -> {
-            subject.run(items);
+            subject.run(items, false);
         });
     }
 
@@ -50,7 +50,7 @@ class RequiredParamTest {
         List<String> items = new ArrayList<>();
 
         Assertions.assertThrows(NoItemsError.class, () -> {
-            subject.run(items);
+            subject.run(items, false);
         });
     }
 
@@ -60,7 +60,7 @@ class RequiredParamTest {
         items.add("");
 
         Assertions.assertThrows(EmptyValueError.class, () -> {
-            subject.run(items);
+            subject.run(items, false);
         });
     }
 
@@ -70,7 +70,7 @@ class RequiredParamTest {
         items.add("item2");
 
         Assertions.assertThrows(MoreThanOneItemError.class, () -> {
-            subject.run(items);
+            subject.run(items, false);
         });
     }
 
