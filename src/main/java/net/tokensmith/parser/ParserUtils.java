@@ -9,7 +9,6 @@ import java.util.List;
 
 
 public class ParserUtils {
-    private static String DELIMITTER = " ";
     private static String REQ_ERROR="Required field failed validation";
     private static String OPT_ERROR="Optional field failed validation";
 
@@ -19,10 +18,11 @@ public class ParserUtils {
      * That should be parsed into a list.
      *
      * @param items converts a string delimitted by a white space to a List
+     * @param delimiter the delimiter to use to parse the input
      * @return a list of strings
      */
-    public List<String> stringToList(String items) {
-        return new ArrayList<>(Arrays.asList(items.split(DELIMITTER)));
+    public List<String> stringToList(String items, String delimiter) {
+        return new ArrayList<>(Arrays.asList(items.split(delimiter)));
     }
 
     public Boolean isExpected(List<String> items, String[] expectedValues) {

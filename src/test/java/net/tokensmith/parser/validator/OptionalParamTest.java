@@ -30,7 +30,7 @@ class OptionalParamTest {
     public void runWhenOneItemShouldBeOK() throws Exception {
         List<String> items = makeItems();
 
-        boolean actual = subject.run(items);
+        boolean actual = subject.run(items, false);
         assertTrue(actual);
     }
 
@@ -38,7 +38,7 @@ class OptionalParamTest {
     public void runWhenZeroItemsShouldBeOK() throws Exception {
         List<String> items = new ArrayList<>();
 
-        boolean actual = subject.run(items);
+        boolean actual = subject.run(items, false);
         assertTrue(actual);
     }
 
@@ -48,7 +48,7 @@ class OptionalParamTest {
         items.add("item2");
 
         Assertions.assertThrows(MoreThanOneItemError.class, () -> {
-            subject.run(items);
+            subject.run(items, false);
         });
     }
 
@@ -58,7 +58,7 @@ class OptionalParamTest {
         items.add("");
 
         Assertions.assertThrows(EmptyValueError.class, () -> {
-            subject.run(items);
+            subject.run(items, false);
         });
     }
 

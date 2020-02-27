@@ -16,4 +16,7 @@ public @interface Parameter {
     boolean required() default true;
     boolean nested() default false;
     String[] expected() default {};
+    boolean parsable() default false;
+    String delimiter() default " ";
+    boolean allowMany() default false;
 }

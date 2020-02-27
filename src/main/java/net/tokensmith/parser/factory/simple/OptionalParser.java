@@ -21,8 +21,7 @@ public class OptionalParser implements TypeParser {
 
     @Override
     public <T> void parse(T to, ParamEntity toField, List<String> from) throws ParseException, RequiredException, OptionalException {
-        List<String> parsedValues = parserUtils.stringToList(from.get(0));
-        Boolean inputOk = parserUtils.isExpected(parsedValues, toField.getParameter().expected());
+        Boolean inputOk = parserUtils.isExpected(from.get(0), toField.getParameter().expected());
 
         if(!inputOk) {
             ValueException ve = new ValueException(UNSUPPORTED_ERROR, toField.getField().getName(), toField.getParameter().name(), from.get(0));
