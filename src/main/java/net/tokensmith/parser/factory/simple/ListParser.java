@@ -26,7 +26,7 @@ public class ListParser implements TypeParser {
         List<String> fromParsed = new ArrayList<>();
         if (toField.getParameter().parsable()) {
             for(String fromValue: from) {
-                fromParsed.addAll(parserUtils.stringToList(fromValue, toField.getParameter().delimitter()));
+                fromParsed.addAll(parserUtils.stringToList(fromValue, toField.getParameter().delimiter()));
             }
         } else {
             fromParsed = from;
