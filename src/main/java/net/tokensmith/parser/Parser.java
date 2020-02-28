@@ -23,6 +23,7 @@ import net.tokensmith.parser.validator.exception.ParamIsNullError;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +33,8 @@ public class Parser {
     private static String TO_OBJ_ERROR = "Could not construct to object";
     private static String REQ_ERROR="Required field failed validation";
     private static String OPT_ERROR="Optional field failed validation";
+    public static Map<Class<?>, List<ParamEntity>> reflectedFields = new HashMap<>();
+    private ReflectParameter reflectParameter;
     private GraphTranslator graphTranslator;
     private OptionalParam optionalParam;
     private RequiredParam requiredParam;
@@ -39,7 +42,8 @@ public class Parser {
     private NestedTypeSetterFactory nestedTypeSetterFactory;
 
 
-    public Parser(GraphTranslator graphTranslator, OptionalParam optionalParam, RequiredParam requiredParam, TypeParserFactory typeParserFactory, NestedTypeSetterFactory nestedTypeSetterFactory) {
+    public Parser(ReflectParameter reflectParameter, GraphTranslator graphTranslator, OptionalParam optionalParam, RequiredParam requiredParam, TypeParserFactory typeParserFactory, NestedTypeSetterFactory nestedTypeSetterFactory) {
+        this.reflectParameter = reflectParameter;
         this.graphTranslator = graphTranslator;
         this.optionalParam = optionalParam;
         this.requiredParam = requiredParam;
@@ -51,7 +55,6 @@ public class Parser {
      * Translates from to an instance of T.
      *
      * @param clazz the Class that is returned
-     * @param fields the List that returned by reflect(Class clazz)
      * @param from the data to translate to T
      * @param <T> the type to translate to
      * @return a new instance of T
@@ -59,7 +62,12 @@ public class Parser {
      * @throws OptionalException if a field that is optional is present and empty or null. If its there it should have a value.
      * @throws ParseException if something went wrong in the framework.
      */
-    public <T> T to(Class<T> clazz, List<ParamEntity> fields, Map<String, List<String>> from) throws RequiredException, OptionalException, ParseException {
+    public <T> T to(Class<T> clazz, Map<String, List<String>> from) throws RequiredException, OptionalException, ParseException {
+        List<ParamEntity> fields = reflectedFields.get(clazz);
+        if (fields == null) {
+            fields = reflectParameter.reflect(clazz);
+            reflectedFields.put(clazz, fields);
+        }
         Map<String, GraphNode<NodeData>> fromGraph = graphTranslator.to(from);
         return toFromGraph(clazz, fields, fromGraph);
     }
