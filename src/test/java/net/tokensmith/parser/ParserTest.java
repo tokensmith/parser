@@ -1,16 +1,12 @@
 package net.tokensmith.parser;
 
 import net.tokensmith.parser.builder.exception.ConstructException;
+import net.tokensmith.parser.config.ParserConfig;
 import net.tokensmith.parser.exception.OptionalException;
 import net.tokensmith.parser.exception.RequiredException;
 import net.tokensmith.parser.exception.ValueException;
-import net.tokensmith.parser.factory.nested.NestedTypeSetterFactory;
-import net.tokensmith.parser.factory.simple.TypeParserFactory;
-import net.tokensmith.parser.graph.GraphTranslator;
 import helper.FixtureFactory;
 import helper.Dummy;
-import net.tokensmith.parser.validator.OptionalParam;
-import net.tokensmith.parser.validator.RequiredParam;
 import net.tokensmith.parser.validator.exception.ParamIsNullError;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;

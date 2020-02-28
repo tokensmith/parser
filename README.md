@@ -4,7 +4,7 @@ Parses url params to POJOS
 ## Coordinates
 #### Gradle
 ```groovy
-compile group: 'net.tokensmith', name: 'parser', version: '0.0.1'
+compile group: 'net.tokensmith', name: 'parser', version: '0.0.2-SNAPSHOT'
 ```
 
 ## Usage

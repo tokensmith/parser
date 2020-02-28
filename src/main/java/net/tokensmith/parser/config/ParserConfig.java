@@ -1,5 +1,7 @@
-package net.tokensmith.parser;
+package net.tokensmith.parser.config;
 
+import net.tokensmith.parser.Parser;
+import net.tokensmith.parser.ReflectParameter;
 import net.tokensmith.parser.builder.exception.ConstructException;
 import net.tokensmith.parser.factory.nested.NestedTypeSetterFactory;
 import net.tokensmith.parser.factory.simple.TypeParserFactory;
