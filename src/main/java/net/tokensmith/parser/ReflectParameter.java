@@ -1,8 +1,10 @@
 package net.tokensmith.parser;
 
 import net.tokensmith.parser.builder.ReflectionBuilder;
+import net.tokensmith.parser.exception.ReflectException;
 import net.tokensmith.parser.validator.RawType;
 
+import javax.management.ReflectionException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -18,7 +20,7 @@ public class ReflectParameter {
         this.builders = builders;
     }
 
-    public List<ParamEntity> reflect(Class clazz) {
+    public List<ParamEntity> reflect(Class clazz) throws ReflectException {
         List<ParamEntity> fields = new ArrayList<>();
 
         if (clazz.getSuperclass() != null) {
@@ -40,7 +42,11 @@ public class ReflectParameter {
                     String argType = pt.getActualTypeArguments()[0].getTypeName();
                     Boolean isList = RawType.LIST.getTypeName().equals(rawType);
                     Boolean isOptional = RawType.OPTIONAL.getTypeName().equals(rawType);
-                    Function<String, Object> builder = builderForField(argType);
+                    Function<String, Object> builder = s -> null;
+                    if (!p.nested()) {
+                        // only need builders for non nested items, b/c parser will use their default.
+                        builder = builderForField(argType);
+                    }
                     nodeClazz = makeClazz(argType);
 
                     node = new ParamEntity.Builder()
@@ -56,7 +62,11 @@ public class ReflectParameter {
                             .children(children)
                             .build();
                 } else {
-                    Function<String, Object> builder = builderForField(field.getGenericType().getTypeName());
+                    Function<String, Object> builder = s -> null;
+                    if (!p.nested()) {
+                        // only need builders for non nested items, b/c parser will use their default.
+                        builder = builderForField(field.getGenericType().getTypeName());
+                    }
                     nodeClazz = makeClazz(field.getGenericType().getTypeName());
 
                     node = new ParamEntity.Builder()
@@ -94,7 +104,7 @@ public class ReflectParameter {
         return (field.getGenericType() instanceof ParameterizedType);
     }
 
-    protected Function<String, Object> builderForField(String className) {
+    protected Function<String, Object> builderForField(String className) throws ReflectException {
         Function<String, Object> builder = builders.get(className);
         if (builder == null) {
             Constructor<?> ctor = ctorForField(className);
@@ -104,20 +114,19 @@ public class ReflectParameter {
         return builder;
     }
 
-    protected Constructor<?> ctorForField(String className) {
+    protected Constructor<?> ctorForField(String className) throws ReflectException {
         Class<?> target;
         try {
             target = Class.forName(className);
         } catch (ClassNotFoundException e) {
-            // TODO: Throw Exception
-            return null;
+            throw new ReflectException(String.format("Unable to find class for %s", className), e, className);
         }
 
         Constructor<?> ctor = null;
         try {
             ctor = target.getConstructor(String.class);
         } catch (NoSuchMethodException e) {
-            // TODO: log me
+            throw new ReflectException(String.format("Unable to find constructor with String parameter for %s", className), e, className);
         }
         return ctor;
     }
