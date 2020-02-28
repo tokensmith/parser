@@ -21,7 +21,7 @@ public class ReflectionBuilder implements Function<String, Object> {
         try {
             item = ctor.newInstance(s);
         } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
-            throw new ConstructException("Unable to construct with value, " + s, e);
+            throw new ConstructException("Unable to construct with value, " + s, e, s);
         }
         return item;
     }

@@ -32,7 +32,7 @@ class ReflectParameterTest {
             try{
                 return UUID.fromString(s);
             } catch (Exception e) {
-                throw new ConstructException("", e);
+                throw new ConstructException("", e, s);
             }
         });
         subject = new ReflectParameter(builders);

@@ -23,22 +23,6 @@ It accepts the following:
 
 An [example](src/test/java/helper/Dummy.java) can be found in the test suite.
 
-### Reflection
-The class that is expected to translate to needs to be inspected.
-```java
-Map<String, Function<String, Object>> builders = new HashMap<>();
-builders.put("java.util.UUID", s -> {
-    try{
-        return UUID.fromString(s);
-    } catch (Exception e) {
-        throw new ConstructException("", e);
-    }
-});
-
-ReflectParameter reflectParameter = new ReflectParameter(builders);
-
-List<ParamEntity> fields = reflectParameter.reflect(Dummy.class);
-```
 
 ### Translation
 Perform the translation.
@@ -46,5 +30,7 @@ Perform the translation.
 // this the input, url params in the form of a Map
 Map<String, List<String>> params = new HashMap();
 
-Dummy actual = subject.to(Dummy.class, fields, params);
+Parser parser = new ParserConfig().parser();
+
+Dummy dummy = parser.to(Dummy.class, params);
 ```
