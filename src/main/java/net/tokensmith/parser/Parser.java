@@ -33,7 +33,7 @@ public class Parser {
     private static String TO_OBJ_ERROR = "Could not construct to object";
     private static String REQ_ERROR="Required field failed validation";
     private static String OPT_ERROR="Optional field failed validation";
-    public static Map<Class<?>, List<ParamEntity>> reflectedFields = new HashMap<>();
+    private static Map<Class<?>, List<ParamEntity>> reflectedFields = new HashMap<>();
     private ReflectParameter reflectParameter;
     private GraphTranslator graphTranslator;
     private OptionalParam optionalParam;
