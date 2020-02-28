@@ -4,6 +4,7 @@ package net.tokensmith.parser;
 
 import net.tokensmith.parser.exception.OptionalException;
 import net.tokensmith.parser.exception.ParseException;
+import net.tokensmith.parser.exception.ReflectException;
 import net.tokensmith.parser.exception.RequiredException;
 import net.tokensmith.parser.factory.nested.NestedTypeSetter;
 import net.tokensmith.parser.factory.nested.NestedTypeSetterFactory;
@@ -60,12 +61,16 @@ public class Parser {
      * @return a new instance of T
      * @throws RequiredException if a field that is required is empty, null, or not present
      * @throws OptionalException if a field that is optional is present and empty or null. If its there it should have a value.
-     * @throws ParseException if something went wrong in the framework.
+     * @throws ParseException if something went wrong in the framework. If a constructor could not be found, field could not be set, etc.
      */
     public <T> T to(Class<T> clazz, Map<String, List<String>> from) throws RequiredException, OptionalException, ParseException {
         List<ParamEntity> fields = reflectedFields.get(clazz);
         if (fields == null) {
-            fields = reflectParameter.reflect(clazz);
+            try {
+                fields = reflectParameter.reflect(clazz);
+            } catch (ReflectException e) {
+                throw new ParseException(String.format("problem reflecting class %s", clazz.toString()), e);
+            }
             reflectedFields.put(clazz, fields);
         }
         Map<String, GraphNode<NodeData>> fromGraph = graphTranslator.to(from);
