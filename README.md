@@ -45,5 +45,5 @@ Map<String, List<String>> params = new HashMap();
 
 Parser parser = new ParserConfig().parser();
 
-ParserExample dummy = parser.to(ParserExample.class, params);
+ParserExample example = parser.to(ParserExample.class, params);
 ```
