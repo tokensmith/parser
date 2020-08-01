@@ -4,7 +4,7 @@ Parses url params to POJOS and performs validation on inputs.
 ## Coordinates
 #### Gradle
 ```groovy
-compile group: 'net.tokensmith', name: 'parser', version: '0.0.2'
+compile group: 'net.tokensmith', name: 'parser', version: '0.0.3'
 ```
 
 ## Usage
